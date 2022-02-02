@@ -22,6 +22,7 @@ function ubaciUListu() {
     if (title != '' && description != '' && people > 0) {
         let p = new project(title, description, people);
         projects.push(p);
+        const li = document.createElement("li");
         li.appendChild(document.createTextNode(`Project: ${title}; Description: ${description}; No. of people: ${people}
         `));
         ul.appendChild(li);
@@ -33,6 +34,5 @@ function ubaciUListu() {
 }
 const button = document.getElementsByTagName('button')[0];
 const ul = document.getElementsByTagName('ul')[0];
-var li = document.createElement("li");
 button.addEventListener('click', ubaciUListu);
 console.log(projects);
