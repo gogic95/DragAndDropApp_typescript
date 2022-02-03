@@ -1,50 +1,57 @@
-console.log('Radi');
-
-const projectInputTemplate = document.getElementById('project-input') as HTMLTemplateElement;
-
-document.body.appendChild(projectInputTemplate.content.cloneNode(true));
-const projectListTemplate = document.getElementById('project-list') as HTMLTemplateElement;
-
-document.body.appendChild(projectListTemplate.content.cloneNode(true));
-
-
-
-class project {
-    constructor(public title: string, public description: string, public people: number) {
-
-    }
-
-}
-
-let projects: project[] = [];
-
-function ubaciUListu() {
-    const titleEl = document.getElementById('title') as HTMLInputElement;
-    let title = titleEl.value;
-    const descriptionEl = document.getElementById('description') as HTMLTextAreaElement;
-    let description = descriptionEl.value;
-    const peopleEl = document.getElementById('people') as HTMLInputElement;
-    let people = +peopleEl.value;
-    if (title != '' && description != '' && people > 0) {
-        let p = new project(title, description, people);
-        projects.push(p);
-        const li = document.createElement("li");
-        li.appendChild(document.createTextNode(`Project: ${title}; Description: ${description}; No. of people: ${people}
-        `));
-        ul.appendChild(li);
-
-    }
-    else {
-        alert("Invalid input!");
-        return;
-    }
+//autobind decorator
+function Autobind(_target: any, _methodName: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    const adjDescriptor: PropertyDescriptor = {
+        configurable: true,
+        get() {
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
+        }
+    };
+    return adjDescriptor;
 }
 
 
-const button = document.getElementsByTagName('button')[0];
-const ul = document.getElementsByTagName('ul')[0];
+// ProjectInput class
+class ProjectInput {
+    templateElement: HTMLTemplateElement;
+    hostElement: HTMLDivElement;
+    element: HTMLFormElement;
+    titleEl: HTMLInputElement;
+    descriptionEl: HTMLInputElement;
+    peopleEl: HTMLInputElement;
 
+    constructor() {
+        this.templateElement = document.getElementById('project-input') as HTMLTemplateElement;
+        this.hostElement = document.getElementById('app') as HTMLDivElement;
 
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild as HTMLFormElement;
+        this.element.id = 'user-input';
 
-button.addEventListener('click', ubaciUListu);
-console.log(projects);
+        this.titleEl = this.element.querySelector('#title') as HTMLInputElement;
+        this.descriptionEl = this.element.querySelector('#description') as HTMLInputElement;
+        this.peopleEl = this.element.querySelector('#people') as HTMLInputElement;
+
+        this.configure();
+        this.attach();
+    }
+
+    @Autobind
+    private submitHandler(event: Event) {
+        event.preventDefault();
+        console.log(this.titleEl.value);
+
+    }
+
+    private configure() {
+        this.element.addEventListener('submit', this.submitHandler);
+    }
+
+    private attach() {
+        this.hostElement.insertAdjacentElement('afterbegin', this.element);
+    }
+}
+
+const projectInput = new ProjectInput();
+
