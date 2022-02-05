@@ -1,10 +1,42 @@
 "use strict";
+// Singleton
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+class ProjectStateSingleton {
+    constructor() {
+        this.projects = [];
+        this.id = 1;
+        this.listeners = [];
+    }
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new ProjectStateSingleton();
+        return this.instance;
+    }
+    addListener(listenerFunc) {
+        this.listeners.push(listenerFunc);
+    }
+    addProject(title, description, numberOfPeople) {
+        const newProject = {
+            id: this.id.toString(),
+            title: title,
+            description: description,
+            people: numberOfPeople
+        };
+        this.id++;
+        this.projects.push(newProject);
+        for (const listenerFunc of this.listeners) {
+            listenerFunc(this.projects.slice());
+        }
+    }
+}
+const projectStateSingleton = ProjectStateSingleton.getInstance();
 function validate(validatableInput) {
     let isValid = true;
     if (validatableInput.required) {
@@ -42,11 +74,24 @@ class ProjectList {
         this.type = type;
         this.templateElement = document.getElementById('project-list');
         this.hostElement = document.getElementById('app');
+        this.assignedProjects = [];
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
         this.element.id = `${this.type}-projects`;
+        projectStateSingleton.addListener((projects) => {
+            this.assignedProjects = projects;
+            this.setProjects();
+        });
         this.attach();
         this.prepareTemplateLooks();
+    }
+    setProjects() {
+        const ulElement = document.getElementById(`${this.type}-projects-list`);
+        for (const project of this.assignedProjects) {
+            const listItem = document.createElement('li');
+            listItem.textContent = project.title;
+            ulElement === null || ulElement === void 0 ? void 0 : ulElement.appendChild(listItem);
+        }
     }
     prepareTemplateLooks() {
         const ulId = `${this.type}-projects-list`;
@@ -105,7 +150,7 @@ class ProjectInput {
         const userInput = this.getInputFromForm();
         if (Array.isArray(userInput)) {
             const [title, desc, people] = userInput;
-            console.log(title, desc, people);
+            projectStateSingleton.addProject(title, desc, people);
             this.resetForm();
         }
     }
