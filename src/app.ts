@@ -160,6 +160,28 @@ abstract class HTMLManipulating<T extends HTMLElement, K extends HTMLElement> {
 	abstract renderContent(): void;
 }
 
+// ProjectItem Class
+class ProjectItem extends HTMLManipulating<HTMLUListElement, HTMLLinkElement> {
+	private project: Project;
+
+	constructor(hostId: string, project: Project) {
+		super("single-project", hostId, false, project.id);
+		this.project = project;
+
+		this.configure();
+		this.renderContent();
+	}
+
+	configure(): void {}
+
+	renderContent(): void {
+		this.element.querySelector("h2")!.textContent = this.project.title;
+		this.element.querySelector("h3")!.textContent =
+			this.project.people.toString();
+		this.element.querySelector("p")!.textContent = this.project.description;
+	}
+}
+
 // ProjectList Class
 class ProjectList extends HTMLManipulating<HTMLDivElement, HTMLElement> {
 	assignedProjects: Project[];
@@ -199,9 +221,7 @@ class ProjectList extends HTMLManipulating<HTMLDivElement, HTMLElement> {
 		ulElement.innerHTML = "";
 
 		for (const project of this.assignedProjects) {
-			const listItem = document.createElement("li");
-			listItem.textContent = project.title;
-			ulElement?.appendChild(listItem);
+			new ProjectItem(this.element.querySelector('ul')!.id, project);
 		}
 	}
 }
