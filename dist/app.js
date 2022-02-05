@@ -45,6 +45,16 @@ class ProjectStateSingleton extends State {
         const newProject = new Project(this.id.toString(), title, description, numberOfPeople, ProjectStatus.Active);
         this.id++;
         this.projects.push(newProject);
+        this.updateListeners();
+    }
+    moveProject(projectId, newStatus) {
+        const project = this.projects.find((proj) => proj.id === projectId);
+        if (project && project.status !== newStatus) {
+            project.status = newStatus;
+        }
+        this.updateListeners();
+    }
+    updateListeners() {
         for (const listenerFunc of this.listeners) {
             listenerFunc(this.projects.slice());
         }
@@ -157,7 +167,8 @@ class ProjectList extends HTMLManipulating {
         }
     }
     dropHandler(event) {
-        console.log(event.dataTransfer.getData("text/plain"));
+        const projectId = event.dataTransfer.getData("text/plain");
+        projectStateSingleton.moveProject(projectId, this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished);
     }
     dragLeaveHandler(_event) {
         const listElements = this.element.querySelector("ul");
@@ -195,6 +206,9 @@ class ProjectList extends HTMLManipulating {
 __decorate([
     Autobind
 ], ProjectList.prototype, "dragOverHandler", null);
+__decorate([
+    Autobind
+], ProjectList.prototype, "dropHandler", null);
 __decorate([
     Autobind
 ], ProjectList.prototype, "dragLeaveHandler", null);
