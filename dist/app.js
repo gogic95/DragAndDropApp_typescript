@@ -113,14 +113,32 @@ class ProjectItem extends HTMLManipulating {
         this.configure();
         this.renderContent();
     }
-    configure() { }
+    get getPeople() {
+        return this.project.people > 1
+            ? ` ${this.project.people} people`
+            : " 1 person";
+    }
+    dragStartHandler(event) {
+        event.dataTransfer.setData("text/plain", this.project.id);
+        event.dataTransfer.effectAllowed = "move";
+    }
+    dragEndHandler(_) {
+        console.log("Dropped");
+    }
+    configure() {
+        this.element.addEventListener("dragstart", this.dragStartHandler);
+        this.element.addEventListener("dragend", this.dragEndHandler);
+    }
     renderContent() {
         this.element.querySelector("h2").textContent = this.project.title;
         this.element.querySelector("h3").textContent =
-            this.project.people.toString();
+            this.getPeople + " assigned";
         this.element.querySelector("p").textContent = this.project.description;
     }
 }
+__decorate([
+    Autobind
+], ProjectItem.prototype, "dragStartHandler", null);
 // ProjectList Class
 class ProjectList extends HTMLManipulating {
     constructor(type) {
@@ -129,6 +147,21 @@ class ProjectList extends HTMLManipulating {
         this.assignedProjects = [];
         this.configure();
         this.renderContent();
+    }
+    dragOverHandler(event) {
+        var _a;
+        if (((_a = event.dataTransfer) === null || _a === void 0 ? void 0 : _a.types[0]) === "text/plain") {
+            event.preventDefault();
+            const listElements = this.element.querySelector("ul");
+            listElements.classList.add("droppable");
+        }
+    }
+    dropHandler(event) {
+        console.log(event.dataTransfer.getData("text/plain"));
+    }
+    dragLeaveHandler(_event) {
+        const listElements = this.element.querySelector("ul");
+        listElements.classList.remove("droppable");
     }
     configure() {
         projectStateSingleton.addListener((projects) => {
@@ -141,6 +174,9 @@ class ProjectList extends HTMLManipulating {
             this.assignedProjects = filteredProjects;
             this.setProjects();
         });
+        this.element.addEventListener("dragover", this.dragOverHandler);
+        this.element.addEventListener("dragleave", this.dragLeaveHandler);
+        this.element.addEventListener("drop", this.dropHandler);
     }
     renderContent() {
         const ulId = `${this.type}-projects-list`;
@@ -152,10 +188,16 @@ class ProjectList extends HTMLManipulating {
         const ulElement = document.getElementById(`${this.type}-projects-list`);
         ulElement.innerHTML = "";
         for (const project of this.assignedProjects) {
-            new ProjectItem(this.element.querySelector('ul').id, project);
+            new ProjectItem(this.element.querySelector("ul").id, project);
         }
     }
 }
+__decorate([
+    Autobind
+], ProjectList.prototype, "dragOverHandler", null);
+__decorate([
+    Autobind
+], ProjectList.prototype, "dragLeaveHandler", null);
 // ProjectInput class
 class ProjectInput extends HTMLManipulating {
     constructor() {
