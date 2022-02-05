@@ -20,7 +20,6 @@ class Project {
         this.status = status;
     }
 }
-// Singleton
 class ProjectStateSingleton {
     constructor() {
         this.projects = [];
@@ -38,12 +37,7 @@ class ProjectStateSingleton {
         this.listeners.push(listenerFunc);
     }
     addProject(title, description, numberOfPeople) {
-        const newProject = {
-            id: this.id.toString(),
-            title: title,
-            description: description,
-            people: numberOfPeople
-        };
+        const newProject = new Project(this.id.toString(), title, description, numberOfPeople, ProjectStatus.Active);
         this.id++;
         this.projects.push(newProject);
         for (const listenerFunc of this.listeners) {
@@ -57,16 +51,22 @@ function validate(validatableInput) {
     if (validatableInput.required) {
         isValid = isValid && validatableInput.value.toString().trim().length !== 0;
     }
-    if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
-        isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
+    if (validatableInput.minLength != null &&
+        typeof validatableInput.value === "string") {
+        isValid =
+            isValid && validatableInput.value.length >= validatableInput.minLength;
     }
-    if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
-        isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
+    if (validatableInput.maxLength != null &&
+        typeof validatableInput.value === "string") {
+        isValid =
+            isValid && validatableInput.value.length <= validatableInput.maxLength;
     }
-    if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+    if (validatableInput.min != null &&
+        typeof validatableInput.value === "number") {
         isValid = isValid && validatableInput.value >= validatableInput.min;
     }
-    if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+    if (validatableInput.max != null &&
+        typeof validatableInput.value === "number") {
         isValid = isValid && validatableInput.value <= validatableInput.max;
     }
     return isValid;
@@ -79,7 +79,7 @@ function Autobind(_target, _methodName, descriptor) {
         get() {
             const boundFn = originalMethod.bind(this);
             return boundFn;
-        }
+        },
     };
     return adjDescriptor;
 }
@@ -87,14 +87,20 @@ function Autobind(_target, _methodName, descriptor) {
 class ProjectList {
     constructor(type) {
         this.type = type;
-        this.templateElement = document.getElementById('project-list');
-        this.hostElement = document.getElementById('app');
+        this.templateElement = document.getElementById("project-list");
+        this.hostElement = document.getElementById("app");
         this.assignedProjects = [];
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
         this.element.id = `${this.type}-projects`;
         projectStateSingleton.addListener((projects) => {
-            this.assignedProjects = projects;
+            const filteredProjects = projects.filter((proj) => {
+                if (this.type === "active") {
+                    return proj.status === ProjectStatus.Active;
+                }
+                return proj.status === ProjectStatus.Finished;
+            });
+            this.assignedProjects = filteredProjects;
             this.setProjects();
         });
         this.attach();
@@ -102,32 +108,34 @@ class ProjectList {
     }
     setProjects() {
         const ulElement = document.getElementById(`${this.type}-projects-list`);
+        ulElement.innerHTML = "";
         for (const project of this.assignedProjects) {
-            const listItem = document.createElement('li');
+            const listItem = document.createElement("li");
             listItem.textContent = project.title;
             ulElement === null || ulElement === void 0 ? void 0 : ulElement.appendChild(listItem);
         }
     }
     prepareTemplateLooks() {
         const ulId = `${this.type}-projects-list`;
-        this.element.querySelector('ul').id = ulId;
-        this.element.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+        this.element.querySelector("ul").id = ulId;
+        this.element.querySelector("h2").textContent =
+            this.type.toUpperCase() + " PROJECTS";
     }
     attach() {
-        this.hostElement.insertAdjacentElement('beforeend', this.element);
+        this.hostElement.insertAdjacentElement("beforeend", this.element);
     }
 }
 // ProjectInput class
 class ProjectInput {
     constructor() {
-        this.templateElement = document.getElementById('project-input');
-        this.hostElement = document.getElementById('app');
+        this.templateElement = document.getElementById("project-input");
+        this.hostElement = document.getElementById("app");
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
-        this.element.id = 'user-input';
-        this.titleEl = this.element.querySelector('#title');
-        this.descriptionEl = this.element.querySelector('#description');
-        this.peopleEl = this.element.querySelector('#people');
+        this.element.id = "user-input";
+        this.titleEl = this.element.querySelector("#title");
+        this.descriptionEl = this.element.querySelector("#description");
+        this.peopleEl = this.element.querySelector("#people");
         this.configure();
         this.attach();
     }
@@ -137,23 +145,23 @@ class ProjectInput {
         const people = +this.peopleEl.value;
         const titleValidatable = {
             value: title,
-            required: true
+            required: true,
         };
         const descriptionValidatable = {
             value: description,
             required: true,
-            minLength: 5
+            minLength: 5,
         };
         const peopleValidatable = {
             value: +people,
             required: true,
             min: 1,
-            max: 5
+            max: 5,
         };
         if (!validate(titleValidatable) ||
             !validate(descriptionValidatable) ||
             !validate(peopleValidatable)) {
-            alert('Invalid input!');
+            alert("Invalid input!");
             return;
         }
         else {
@@ -170,20 +178,20 @@ class ProjectInput {
         }
     }
     resetForm() {
-        this.titleEl.value = '';
-        this.descriptionEl.value = '';
-        this.peopleEl.value = '';
+        this.titleEl.value = "";
+        this.descriptionEl.value = "";
+        this.peopleEl.value = "";
     }
     configure() {
-        this.element.addEventListener('submit', this.submitHandler);
+        this.element.addEventListener("submit", this.submitHandler);
     }
     attach() {
-        this.hostElement.insertAdjacentElement('afterbegin', this.element);
+        this.hostElement.insertAdjacentElement("afterbegin", this.element);
     }
 }
 __decorate([
     Autobind
 ], ProjectInput.prototype, "submitHandler", null);
 const projectInput = new ProjectInput();
-const activeProjectList = new ProjectList('active');
-const finishedProjectList = new ProjectList('finished');
+const activeProjectList = new ProjectList("active");
+const finishedProjectList = new ProjectList("finished");
