@@ -1,9 +1,9 @@
-import { Autobind } from "../decorators/autobind.js";
-import { HTMLManipulating } from "./HTMLManipulating.js";
-import { DropTarget } from "../models/dragAndDropInterfaces.js";
-import { Project, ProjectStatus } from "../models/project.js";
-import { projectStateSingleton } from "../state/projectSingleton.js";
-import { ProjectItem } from "./projectItem.js";
+import { Autobind } from "../decorators/autobind";
+import { HTMLManipulating } from "./HTMLManipulating";
+import { DropTarget } from "../models/dragAndDropInterfaces";
+import { Project, ProjectStatus } from "../models/project";
+import { projectStateSingleton } from "../state/projectSingleton";
+import { ProjectItem } from "./projectItem";
 
 // ProjectList Class
 export class ProjectList

@@ -1,7 +1,7 @@
-import { HTMLManipulating } from "./HTMLManipulating.js";
-import * as Validation from "../util/validation.js";
-import { Autobind as autobind } from "../decorators/autobind.js";
-import { projectStateSingleton } from "../state/projectSingleton.js";
+import { HTMLManipulating } from "./HTMLManipulating";
+import * as Validation from "../util/validation";
+import { Autobind as autobind } from "../decorators/autobind";
+import { projectStateSingleton } from "../state/projectSingleton";
 
 // ProjectInput class
 

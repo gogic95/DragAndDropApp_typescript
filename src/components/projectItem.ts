@@ -1,7 +1,7 @@
-import { Autobind } from "../decorators/autobind.js";
-import { Draggable } from "../models/dragAndDropInterfaces.js";
-import { Project } from "../models/project.js";
-import { HTMLManipulating } from "./HTMLManipulating.js";
+import { Autobind } from "../decorators/autobind";
+import { Draggable } from "../models/dragAndDropInterfaces";
+import { Project } from "../models/project";
+import { HTMLManipulating } from "./HTMLManipulating";
 
 // ProjectItem Class
 export class ProjectItem
