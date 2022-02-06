@@ -42,7 +42,10 @@ export class ProjectInput extends HTMLManipulating {
         if (!Validation.validate(titleValidatable) ||
             !Validation.validate(descriptionValidatable) ||
             !Validation.validate(peopleValidatable)) {
-            alert("Invalid input!");
+            alert(`Invalid input!
+All fields are required.
+Description must contain more than 5 characters.
+Allowed number of people: 1-5.`);
             return;
         }
         else {
